@@ -1,51 +1,66 @@
-# 🔗 Scalable URL Shortener
+# 🚀 Scalable URL Shortener
 
-A microservices-based URL shortening application built with **Python (Flask)**, **Vue.js**, **Redis**, **RabbitMQ**, and **PostgreSQL**.
-
-The project demonstrates a modern architecture designed for high performance and scalability using Docker containers.
-
-## 🚀 Features
-
-* **URL Shortening:** Generate unique short codes for long URLs.
-* **High Performance Redirection:** Uses **Redis** caching to redirect users instantly without querying the primary database.
-* **Asynchronous Analytics:** Uses **RabbitMQ** and a background **Worker** to log detailed click statistics (timestamp, user-agent) to PostgreSQL without blocking the user request.
-* **Real-time Counter:** Immediate click counting stored in Redis.
-* **Containerization:** Fully dockerized environment using `docker-compose`.
+A high-performance, microservices-based URL shortening application designed for scalability and modern DevOps practices.
+The project demonstrates an **Event-Driven Architecture** using **Python (Flask)**, **Vue.js 3 (Vite)**, **Redis**, **RabbitMQ**, and **PostgreSQL**.
 
 ---
 
-## 🛠 Tech Stack
+## 🌟 Key Features
 
-| Component | Technology | Description |
-|-----------|------------|-------------|
-| **Frontend** | Vue.js + Nginx | Simple UI for creating links and viewing stats. |
-| **Backend** | Python (Flask) | REST API for business logic. |
-| **Database** | PostgreSQL | Persistent storage for links and detailed logs. |
-| **Cache** | Redis | High-speed counter and caching layer. |
-| **Message Broker** | RabbitMQ | Queues tasks for asynchronous processing. |
-| **Worker** | Python | Consumes messages from RabbitMQ to write logs to DB. |
+* **⚡️ Blazing Fast Redirection:** Uses **Redis** in-memory caching to redirect users instantly without querying the disk-based database.
+* **📈 Real-time Analytics:** Tracks clicks instantly using Redis counters.
+* **📩 Asynchronous Logging:** Uses **RabbitMQ** and a background **Worker** to save detailed logs (User-Agent, Timestamp, IP) to **PostgreSQL** without blocking the user request.
+* **🛠 Modern Frontend:** Built with **Vue.js 3** and **Vite**, served via **Nginx** (Multi-stage Docker build).
+* **🐳 Fully Dockerized:** Ready to deploy with a single command using `docker-compose`.
 
 ---
 
 ## 🏗 Architecture
 
-The system uses an asynchronous pattern to handle high traffic:
+The system is split into isolated microservices:
 
-1.  **User Click:** User accesses a short link.
-2.  **Redis (Cache):** The backend immediately increments the click counter in Redis and redirects the user.
-3.  **RabbitMQ (Queue):** Simultaneously, the backend sends a "click event" message to the queue.
-4.  **Worker:** A separate background process picks up the message and saves detailed logs (time, IP, browser) to **PostgreSQL**.
+1.  **Frontend (Vue.js + Nginx):** A responsive UI for creating links and viewing stats.
+2.  **Backend (Flask API):** Handles requests, manages caching, and publishes events to the queue.
+3.  **RabbitMQ (Message Broker):** Buffers "Click Events" to handle high traffic loads.
+4.  **Worker (Python):** Consumes messages from RabbitMQ and saves data to the database in the background.
+5.  **Redis (Cache):** Stores hot data (short links) and real-time counters.
+6.  **PostgreSQL (DB):** Persistent storage for links and detailed analytics history.
 
-This ensures that writing to the hard drive (Database) never slows down the user redirection.
+### Data Flow Diagram
 
----
+```mermaid
+graph LR
+    User(User) -->|1. Click| Nginx(Frontend)
+    Nginx -->|2. Request| API(Backend API)
+    API -->|3. Get Link & Incr| Redis[(Redis Cache)]
+    API -->|4. Publish Event| RMQ(RabbitMQ)
+    API -->|5. Redirect| User
+    RMQ -->|6. Consume| Worker(Background Worker)
+    Worker -->|7. Save Log| DB[(PostgreSQL)]
+```
 
-## ⚙️ Installation & Running
+
+
+## 🛠 Tech Stack
+
+| Component | Technology | Role |
+|-----------|------------|------|
+| **Frontend** | Vue.js 3, Vite, Bootstrap | User Interface |
+| **Server** | Nginx (Alpine) | Static File Serving & Reverse Proxy |
+| **Backend** | Python 3.9, Flask | REST API |
+| **Database** | PostgreSQL 15 | Persistent Data Storage |
+| **Cache** | Redis | High-speed Caching & Counters |
+| **Queue** | RabbitMQ | Asynchronous Message Broker |
+| **DevOps** | Docker, Docker Compose | Containerization & Orchestration |
+
+
+
+## 🚀 Getting Started (Local)
 
 ### Prerequisites
 * Docker & Docker Compose installed.
 
-### Steps to Run
+### Installation
 
 1.  **Clone the repository:**
     ```bash
@@ -53,34 +68,59 @@ This ensures that writing to the hard drive (Database) never slows down the user
     cd url-shortener
     ```
 
-2.  **Start the application:**
+2.  **Run with Docker Compose:**
     ```bash
     docker-compose up --build
     ```
 
-3.  **Access the application:**
-    * **Web Interface:** [http://localhost:8080](http://localhost:8080)
-    * **RabbitMQ Management:** [http://localhost:15672](http://localhost:15672) (Login: `guest` / `guest`)
-    * **API:** [http://localhost:5000](http://localhost:5000)
+3.  **Access the App:**
+    * 🌍 **Frontend:** [http://localhost:8080](http://localhost:8080)
+    * 🔌 **Backend API:** [http://localhost:5000](http://localhost:5000)
+    * 🐰 **RabbitMQ Dashboard:** [http://localhost:15672](http://localhost:15672) (Login: `guest` / `guest`)
 
----
 
-## 🧪 How to Test
 
-### 1. Shorten a Link
-Open [http://localhost:8080](http://localhost:8080), paste a long URL (e.g., `https://google.com`), and click **Shorten**.
 
-### 2. Generate Traffic
-Open the generated short link. You will be redirected to the original site.
+    ## ☁️ Deployment (Railway/Production)
 
-### 3. Verify Queues (RabbitMQ)
-To see the asynchronous processing in action:
-1.  Go to [http://localhost:15672](http://localhost:15672).
-2.  Navigate to the **Queues** tab.
-3.  Click your short link multiple times.
-4.  Observe the **"Message rates"** graph spiking, indicating that messages are flowing through the system.
+This project is configured for seamless deployment on [Railway.app](https://railway.app/).
 
-### 4. Check Logs
-View the worker logs to see data being saved to the database:
-```bash
-docker-compose logs -f worker
+### Environment Variables
+When deploying, ensure the following variables are set:
+
+**Backend & Worker:**
+* `DATABASE_URL`: Connection string to PostgreSQL.
+* `REDIS_URL`: Connection string to Redis (including password).
+* `RABBITMQ_HOST`: Hostname of the RabbitMQ service (e.g., `rabbitmq`).
+* `PORT`: `5000`
+
+**Frontend:**
+* `VITE_BACKEND_URL`: The public URL of your deployed Backend (e.g., `https://web-production-xxxx.up.railway.app`).
+* `PORT`: `80`
+
+
+
+
+## 📂 Project Structure
+
+```text
+.
+├── docker-compose.yml      # Local development orchestration
+├── README.md               # Documentation
+├── backend/                # Python Monorepo (API + Worker)
+│   ├── app.py              # Flask API Entrypoint
+│   ├── worker.py           # Background Worker Entrypoint
+│   ├── Dockerfile          # Backend Docker config
+│   └── requirements.txt    # Python dependencies
+└── frontend/               # Vue.js Application
+    ├── src/                # Source code
+    │   ├── App.vue         # Main Component
+    │   └── main.js         # Entrypoint
+    ├── vite.config.js      # Vite configuration
+    └── Dockerfile          # Multi-stage build (Node -> Nginx)
+
+
+
+
+
+    
