@@ -16,7 +16,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-r = redis.Redis(host=os.getenv('REDIS_HOST', 'redis'), port=6379, decode_responses=True)
+# Настройки Redis
+# Сначала пробуем взять полную ссылку (с паролем), если её нет - пробуем по хосту
+redis_url = os.getenv('REDIS_URL')
+if redis_url:
+    r = redis.from_url(redis_url, decode_responses=True)
+else:
+    r = redis.Redis(host=os.getenv('REDIS_HOST', 'redis'), port=6379, decode_responses=True)
 
 def send_to_queue(message):
     try:
