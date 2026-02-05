@@ -55,7 +55,7 @@
                 async shortenUrl() {
                     if (!this.urlToShorten) return;
                     try {
-                        const response = await fetch('http://localhost:5000/shorten', {
+                        const response = await fetch('http://url-shortener-production-fbc5.up.railway.app/shorten', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ url: this.urlToShorten })
@@ -70,7 +70,7 @@
                 async checkStats() {
                     if (!this.codeToCheck) return;
                     try {
-                        const response = await fetch(`http://localhost:5000/stats/${this.codeToCheck}`);
+                        const response = await fetch(`http://url-shortener-production-fbc5.up.railway.app/stats/${this.codeToCheck}`);
                         if (response.ok) {
                             this.stats = await response.json();
                         } else {
