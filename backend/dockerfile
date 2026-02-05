@@ -1,13 +1,23 @@
+# Используем slim версию (она легкая, но требует установки библиотек)
 FROM python:3.9-slim
 
 WORKDIR /app
 
+# --- ЭТО НОВАЯ ЧАСТЬ ---
+# Устанавливаем системные библиотеки (gcc и libpq-dev), 
+# которые нужны для сборки psycopg2
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+# -----------------------
 
+# Установка зависимостей Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-
+# Копирование кода
 COPY . .
 
-
-CMD ["python", "app.py"]
+# Запуск приложения (не забываем про host 0.0.0.0 и PORT)
+CMD sh -c "python app.py"
