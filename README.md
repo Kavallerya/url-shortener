@@ -101,25 +101,6 @@ When deploying, ensure the following variables are set:
 
 
 
-## 📂 Project Structure
-
-```text
-.
-├── docker-compose.yml      # Local development orchestration
-├── README.md               # Documentation
-├── backend/                # Python Monorepo (API + Worker)
-│   ├── app.py              # Flask API Entrypoint
-│   ├── worker.py           # Background Worker Entrypoint
-│   ├── Dockerfile          # Backend Docker config
-│   └── requirements.txt    # Python dependencies
-└── frontend/               # Vue.js Application
-    ├── src/                # Source code
-    │   ├── App.vue         # Main Component
-    │   └── main.js         # Entrypoint
-    ├── vite.config.js      # Vite configuration
-    └── Dockerfile          # Multi-stage build (Node -> Nginx)
-
-
 
 
 
