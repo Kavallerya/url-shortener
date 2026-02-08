@@ -41,8 +41,7 @@ export default {
             shortCode: '',
             codeToCheck: '',
             stats: null,
-            // VITE_BACKEND_URL берется из переменных окружения
-            // Если переменной нет, по умолчанию будет localhost (для локальных тестов)
+            // VITE_BACKEND_URL 
             backendUrl: import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
         }
     },
@@ -50,7 +49,7 @@ export default {
         async shortenUrl() {
             if (!this.urlToShorten) return;
             try {
-                // Убираем слеш в конце URL, если он есть, чтобы не было двойных слешей //
+
                 const baseUrl = this.backendUrl.replace(/\/$/, '');
 
                 const response = await fetch(`${baseUrl}/shorten`, {
@@ -62,7 +61,7 @@ export default {
                 if (!response.ok) throw new Error('Network response was not ok');
 
                 const data = await response.json();
-                // Заменяем локальный адрес бэкенда на адрес фронтенда или используем то, что прислал бэк
+
                 this.resultUrl = data.full_short_url.replace('http://localhost:5000', baseUrl);
                 this.shortCode = data.short_code;
             } catch (e) {
