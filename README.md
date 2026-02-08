@@ -64,20 +64,25 @@ graph LR
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/url-shortener.git](https://github.com/YOUR_USERNAME/url-shortener.git)
+    git clone [https://github.com/Kavallerya/url-shortener.git]
     cd url-shortener
     ```
 
-2.  **Run with Docker Compose:**
+2.  **Setup Environment Variables:**
+    Create a `.env` file in the root directory and add your secrets:
+    ```bash
+    # Create .env file
+    echo "POSTGRES_USER=user" >> .env
+    echo "POSTGRES_PASSWORD=password" >> .env
+    echo "POSTGRES_DB=urls_db" >> .env
+    echo "RABBITMQ_DEFAULT_USER=guest" >> .env
+    echo "RABBITMQ_DEFAULT_PASS=guest" >> .env
+    ```
+
+3.  **Run with Docker Compose:**
     ```bash
     docker-compose up --build
     ```
-
-3.  **Access the App:**
-    * 🌍 **Frontend:** [http://localhost:8080](http://localhost:8080)
-    * 🔌 **Backend API:** [http://localhost:5000](http://localhost:5000)
-    * 🐰 **RabbitMQ Dashboard:** [http://localhost:15672](http://localhost:15672) (Login: `guest` / `guest`)
-
 
 
 

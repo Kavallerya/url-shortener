@@ -16,8 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Настройки Redis
-# Сначала пробуем взять полную ссылку (с паролем), если её нет - пробуем по хосту
+# Redis
 redis_url = os.getenv('REDIS_URL')
 if redis_url:
     r = redis.from_url(redis_url, decode_responses=True)
